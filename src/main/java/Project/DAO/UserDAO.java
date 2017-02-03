@@ -8,5 +8,7 @@ public interface UserDAO {
 
     public User getById(long id, boolean lazy);
 
+    public User getByMail(String mail);
+
     public void delete(User user);
 }

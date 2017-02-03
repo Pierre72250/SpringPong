@@ -32,6 +32,17 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public User getByMail(String mail) {
+        try{
+            javax.persistence.Query query = sessionFactory.getCurrentSession().createQuery("from User where mail = :mail");
+            query.setParameter("mail", mail);
+            return (User)query.getSingleResult();
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    @Override
     public void delete(User user) {
         sessionFactory.getCurrentSession().remove(user);
     }
