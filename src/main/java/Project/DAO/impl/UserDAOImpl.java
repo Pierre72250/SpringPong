@@ -25,10 +25,15 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public User getById(long id, boolean lazy) {
-        User user =  sessionFactory.getCurrentSession().get(User.class, id);
-        if (lazy)
-            Hibernate.initialize(user.getMessages());
-        return user;
+        try{
+            User user =  sessionFactory.getCurrentSession().get(User.class, id);
+            if (lazy)
+                Hibernate.initialize(user.getParticipations());
+
+            return user;
+        }catch (Exception e){
+            return null;
+        }
     }
 
     @Override

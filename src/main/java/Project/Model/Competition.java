@@ -1,5 +1,6 @@
 package Project.Model;
 
+import com.sun.org.apache.regexp.internal.RE;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,14 +26,45 @@ public class Competition implements Serializable {
     @Size(min = 2, max = 50)
     @Getter @Setter private String name;
 
-    @Column(name="joinCode")
-    @Size(min = 2, max = 50)
-    @Getter @Setter private String joinCode;
+    @Column(name="description")
+    @Getter @Setter private String description;
 
-    public Competition() {}
+    @Column(name="state")
+    @Getter @Setter private Boolean state;
 
-    public Competition(String name, String joinCode)  {
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(cascade=CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "competition")
+    @Getter @Setter private List<Participation> participations;
+
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(cascade=CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "competition")
+    @Getter @Setter private List<Resultat> resultats;
+
+    public Competition() {
+        this.participations = new ArrayList<Participation>();
+        this.resultats = new ArrayList<Resultat>();
+    }
+
+    public Competition(String name, String description, Boolean state)  {
+        this();
         this.name = name;
-        this.joinCode = joinCode;
+        this.description = description;
+        this.state = state;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Competition that = (Competition) o;
+
+        return id == that.id;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
     }
 }

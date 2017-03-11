@@ -1,7 +1,7 @@
 package Project.Controller;
 
-import Project.Model.User;
-import Project.Service.UserService;
+import Project.Model.*;
+import Project.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -9,20 +9,31 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
+import java.util.Calendar;
+import java.util.Date;
 
 @Controller
 public class MainController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private CompetitionService competitionService;
+    @Autowired
+    private ParticipationService participationService;
+    @Autowired
+    private EloService eloService;
+
 
     @RequestMapping(method = RequestMethod.GET, value = "/")
     public String main(ModelMap modelMap, HttpSession httpSession) {
 
-        // Envoie d'un objet User vide, pour qu'il soit rempli par le formulaire
-        modelMap.addAttribute("UserForm", new User());
+        // Envoie d'un objet User vide, pour qu'il soit rempli par le formulaire d'inscription
+        modelMap.addAttribute("UserInscription", new User());
+        // Envoie d'un objet User vide, pour qu'il soit rempli par le formulaire de connection
         modelMap.addAttribute("UserConnection", new User());
 
         // Retourne la page d'accueil du site
@@ -30,7 +41,7 @@ public class MainController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/addUser")
-    public String addUser(@ModelAttribute("UserForm") User user, @RequestParam("confirmPassword") String confirmPassword, BindingResult result, ModelMap modelMap, HttpSession httpSession) {
+    public String addUser(@ModelAttribute("UserInscription") User user, @RequestParam("confirmPassword") String confirmPassword, BindingResult result, ModelMap modelMap, HttpSession httpSession) {
 
         if (!user.getPassword().equals(confirmPassword)){
             return "redirect:/";
@@ -38,24 +49,14 @@ public class MainController {
 
         user.setPassword(encodeSHA512(user.getPassword()));
 
-        // Recuperation de l'utilisateur connecté
-        User userSession = (User) httpSession.getAttribute("userSession");
-
         // On ajoute l'utilisateur dans la bdd
         long id = userService.add(user);
 
-        // On connecte l'utilisateur seulement si aucun compte n'est connecté au moment de l'envoie du formulaire
-        if (userSession == null) {
+        // Récupération de l'utilisateur
+        User currentUser = userService.getById(id, true);
 
-            // Récupération de l'utilisateur
-            userSession = userService.getById(id, true);
-
-            // Sauvegarde de l'utilisateur dans la session
-            userSession.setPassword("");
-            httpSession.setAttribute("userSession", userSession);
-
-        }
-        //return "Main/moncompte";
+        // Sauvegarde de l'utilisateur dans la session
+        httpSession.setAttribute("currentUserId", currentUser.getId());
 
         return "redirect:/profile/" + user.getId() + "";
     }
@@ -64,21 +65,24 @@ public class MainController {
     public String connection(@ModelAttribute("UserConnection") User user, BindingResult result, ModelMap modelMap, HttpSession httpSession) {
 
         // Récupération de l'utilisateur
-        User userSession = (User) userService.getByMail(user.getMail());
-        modelMap.addAttribute("UserForm", new User());
+        User currentUser = (User) userService.getByMail(user.getMail());
 
-        if(userSession == null){
+        if(currentUser == null){
+            user.setPassword("");
+            modelMap.addAttribute("UserInscription", new User());
+            modelMap.addAttribute("UserConnection", user);
             return "Main/index";
         }
 
         user.setPassword(encodeSHA512(user.getPassword()));
 
-        if(userSession.getPassword().equals(user.getPassword())){
-            userSession.setPassword("");
-            httpSession.setAttribute("userSession", userSession);
-            return "redirect:/profile/" + userSession.getId() + "";
+        if(currentUser.getPassword().equals(user.getPassword())){
+            httpSession.setAttribute("currentUserId", currentUser.getId());
+            return "redirect:/profile/" + currentUser.getId() + "";
         }else{
             user.setPassword("");
+            modelMap.addAttribute("UserInscription", new User());
+            modelMap.addAttribute("UserConnection", user);
             return "Main/index";
         }
 
@@ -89,20 +93,6 @@ public class MainController {
         // On vide le session et on renvoie l'utilisateur vers la page d'accueil du site
         httpSession.invalidate();
         return "redirect:/";
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/compte")
-    public String monCompte(ModelMap modelMap, HttpSession httpSession) {
-        modelMap.addAttribute("UserConnection", new User());
-        return "Main/moncompte";
-    }
-
-    @RequestMapping("profile/{id}")
-    public String profile(@PathVariable("id") long id, ModelMap modelMap, HttpSession httpSession) {
-        User userProfile = (User) userService.getById(id, false);
-        modelMap.addAttribute("userProfile", userProfile);
-        modelMap.addAttribute("UserConnection", new User());
-        return "Main/profile";
     }
 
     public static String encodeSHA512(String password) {

@@ -2,12 +2,15 @@ package Project.Model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,14 +42,42 @@ public class User implements Serializable {
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(cascade=CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "user")
-    @Getter @Setter private List<Message> messages;
+    @Getter @Setter private List<Participation> participations;
 
-    public User() {}
+    public User() {this.participations = new ArrayList<Participation>();}
 
-    public User(String name, String surname, String mail, String password, int elo)  {
+    public User(String name, String surname, String mail, String password)  {
+        this();
         this.name = name;
         this.surname = surname;
         this.mail = mail;
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", mail='" + mail + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return id == user.id;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
     }
 }
