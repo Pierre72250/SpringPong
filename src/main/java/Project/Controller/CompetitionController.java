@@ -10,7 +10,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by Pierre on 03/03/2017.
@@ -35,14 +37,15 @@ public class CompetitionController {
         Competition competition = (Competition) competitionService.getById(id, true);
 
         // Recuperation de l'id de l'utilisateur connecté
-        long currentUserId = (Long) httpSession.getAttribute("currentUserId");
+        long currentUserId;
+        try{
+            currentUserId = (Long) httpSession.getAttribute("currentUserId");
+        }catch (Exception e){
+            return "redirect:/";
+        }
 
         // Récuperer currentUser
         User currentUser = userService.getById(currentUserId, true);
-
-        if (currentUser == null){
-            return "redirect:/";
-        }
 
         // Envoie du currentUser à la JSP
         modelMap.addAttribute("currentUser", currentUser);
@@ -64,16 +67,27 @@ public class CompetitionController {
 
         if(participe){
             modelMap.addAttribute("newResultat", new ResultatForm());
+            modelMap.addAttribute("currentUserEloHistory", participationService.get(competition, currentUser, true).getElos());
         }
 
         modelMap.addAttribute("currentUserParticipations", currentUser.getParticipations());
 
         modelMap.addAttribute("currentCompetition", competition);
         modelMap.addAttribute("currentResultats", competition.getResultats());
+        modelMap.addAttribute("nbResultats", competition.getResultats().size());
+
+        DateFormat mediumDateFormat = DateFormat.getDateTimeInstance(
+                DateFormat.MEDIUM,
+                DateFormat.MEDIUM);
+        String date = mediumDateFormat.format(competition.getCreation());
+        date = date.substring(0, date.length() -9);
+
+        modelMap.addAttribute("creationDate", date );
 
         modelMap.addAttribute("newCompetition", new Competition());
 
         modelMap.addAttribute("participations", competition.getParticipations());
+        modelMap.addAttribute("nbParticipants", competition.getParticipations().size());
 
         Elo currentUserElo = eloService.getLastElo(competition.getParticipations().get(0));
         modelMap.addAttribute("currentUserElo", currentUserElo);
@@ -89,14 +103,19 @@ public class CompetitionController {
         long idCompetition = competitionService.add(competition);
 
         // Recuperation de l'id de l'utilisateur connecté
-        long currentUserId = (Long) httpSession.getAttribute("currentUserId");
+        long currentUserId;
+        try{
+            currentUserId = (Long) httpSession.getAttribute("currentUserId");
+        }catch (Exception e){
+            return "redirect:/";
+        }
 
         // Récuperer currentUser
         User currentUser = userService.getById(currentUserId, true);
 
         Participation participation = new Participation(currentUser, competition, true);
 
-        participation.getElos().add(new Elo(1500, participation ));
+        participation.getElos().add(new Elo(1500, participation));
 
         long idParticipation = participationService.add(participation);
 
@@ -109,7 +128,12 @@ public class CompetitionController {
         Competition competition = (Competition) competitionService.getById(idCompetition, true);
 
         // Recuperation de l'id de l'utilisateur connecté
-        long currentUserId = (Long) httpSession.getAttribute("currentUserId");
+        long currentUserId;
+        try{
+            currentUserId = (Long) httpSession.getAttribute("currentUserId");
+        }catch (Exception e){
+            return "redirect:/";
+        }
 
         // Récuperer currentUser
         User currentUser = userService.getById(currentUserId, true);
@@ -183,10 +207,12 @@ public class CompetitionController {
     }
 
     public static int getConstant(int elo) {
-        if (elo < 2000)
+        if (elo < 2000){
             return 32;
-        if (elo < 2401)
+        }else if (elo < 2401){
             return 24;
-        return 16;
+        }else{
+            return 16;
+        }
     }
 }

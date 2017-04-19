@@ -3,7 +3,7 @@
 <div class="col-md-3 left_col" xmlns:form="http://www.w3.org/1999/html">
     <div class="left_col scroll-view">
         <div class="navbar nav_title" style="border: 0;">
-            <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>Spring - Pong</span></a>
+            <a href="/" class="site_title"><i class="fa fa-paw"></i> <span>Spring - Pong</span></a>
         </div>
 
         <div class="clearfix"></div>
@@ -46,7 +46,7 @@
             <a data-toggle="tooltip" data-placement="top" title="Informations">
                 <i class="fa fa-info-circle" ></i>
             </a>
-            <a data-toggle="tooltip" data-placement="top" title="Réglages">
+            <a data-toggle="tooltip" data-placement="top" title="Réglages" href="/SpringPong/settings">
                 <i class="fa fa-cog" ></i>
             </a>
             <a data-toggle="tooltip" data-placement="top" title="Déconnexion" href="/SpringPong/deconnection">
@@ -72,7 +72,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-usermenu pull-right">
                         <li><a href="/SpringPong/profile/${currentUser.id}">Profil</a></li>
-                        <li><a href="#">Réglages</a></li>
+                        <li><a href="/SpringPong/settings">Paramètres</a></li>
                         <li><a href="/SpringPong/deconnection"><i class="fa fa-power-off pull-right"></i>Déconnexion</a></li>
                     </ul>
                 </li>

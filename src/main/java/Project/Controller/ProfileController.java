@@ -4,10 +4,8 @@ import Project.Model.Competition;
 import Project.Model.Elo;
 import Project.Model.Participation;
 import Project.Model.User;
-import Project.Service.CompetitionService;
-import Project.Service.EloService;
-import Project.Service.ParticipationService;
-import Project.Service.UserService;
+import Project.Service.*;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -32,6 +30,8 @@ public class ProfileController {
     private ParticipationService participationService;
     @Autowired
     private EloService eloService;
+    @Autowired
+    private ResulatService resulatService;
 
     @RequestMapping("profile/{id}")
     public String profile(@PathVariable("id") long id, ModelMap modelMap, HttpSession httpSession) {
@@ -40,20 +40,26 @@ public class ProfileController {
         userProfile.setPassword("");
 
         // Recuperation de l'id de l'utilisateur connecté
-        long currentUserId = (Long) httpSession.getAttribute("currentUserId");
-        // Récuperer currentUser
-        User currentUser = userService.getById(currentUserId, true);
-
-        // Renvoie l'utilisateur sur la page de connection si il n'es pas connecté
-        if(currentUser == null){
+        long currentUserId;
+        try{
+            currentUserId = (Long) httpSession.getAttribute("currentUserId");
+        }catch (Exception e){
             return "redirect:/";
         }
+
+        // Récuperer currentUser
+        User currentUser = userService.getById(currentUserId, true);
 
         modelMap.addAttribute("currentUser", currentUser);
         modelMap.addAttribute("currentUserParticipations", currentUser.getParticipations());
 
         modelMap.addAttribute("userProfile", userProfile);
         modelMap.addAttribute("participations", userProfile.getParticipations());
+
+        modelMap.addAttribute("totalMatchs", resulatService.getTotalMatchs(userProfile));
+        modelMap.addAttribute("totalVictories", resulatService.getTotalVictories(userProfile));
+        modelMap.addAttribute("totalLooses", resulatService.getTotalLooses(userProfile));
+
 
         modelMap.addAttribute("UpdateUserForm", userProfile);
         modelMap.addAttribute("newCompetition", new Competition());
@@ -64,5 +70,51 @@ public class ProfileController {
     @RequestMapping(method = RequestMethod.POST, value = "/addprofilepicture")
     public String updateUser(@RequestParam("file") MultipartFile file, BindingResult result, ModelMap modelMap, HttpSession httpSession) {
         return "";
+    }
+
+    @RequestMapping("settings")
+    public String settings(ModelMap modelMap, HttpSession httpSession) {
+
+        // Recuperation de l'utilisateur connecté
+        long currentUserId;
+        try{
+            currentUserId = (Long) httpSession.getAttribute("currentUserId");
+        }catch (Exception e){
+            return "redirect:/";
+        }
+        User currentUser = userService.getById(currentUserId, true);
+        currentUser.setPassword("");
+
+        modelMap.addAttribute("currentUser", currentUser);
+        modelMap.addAttribute("currentUserParticipations", currentUser.getParticipations());
+        modelMap.addAttribute("newCompetition", new Competition());
+
+        modelMap.addAttribute("userInformationForm", currentUser);
+        modelMap.addAttribute("userLoginForm", currentUser);
+
+        return "Main/settings";
+    }
+
+    @RequestMapping("updateUserInformations")
+    public String updateUserInformations(ModelMap modelMap, HttpSession httpSession) {
+
+        // Recuperation de l'utilisateur connecté
+        long currentUserId;
+        try{
+            currentUserId = (Long) httpSession.getAttribute("currentUserId");
+        }catch (Exception e){
+            return "redirect:/";
+        }
+        User currentUser = userService.getById(currentUserId, true);
+        currentUser.setPassword("");
+
+        modelMap.addAttribute("currentUser", currentUser);
+        modelMap.addAttribute("currentUserParticipations", currentUser.getParticipations());
+        modelMap.addAttribute("newCompetition", new Competition());
+
+        modelMap.addAttribute("userInformationForm", currentUser);
+        modelMap.addAttribute("userLoginForm", currentUser);
+
+        return "redirect:/settings";
     }
 }

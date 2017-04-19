@@ -21,20 +21,37 @@
             <div class="right_col" role="main">
                 <h2>${userProfile.surname} ${userProfile.name}</h2>
                 <div class="col-md-4">
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th>Compétition</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <c:forEach items="${participations}" var="participation">
-                            <tr class='clickable-row' data-href='/SpringPong/competition/${participation.competition.id}'>
-                                <td>${participation.competition.name}</td>
+                    <div class="tuile">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Compétitions</th>
                             </tr>
-                        </c:forEach>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            <c:forEach items="${participations}" var="participation">
+                                <tr class='clickable-row' data-href='/SpringPong/competition/${participation.competition.id}'>
+                                    <td>${participation.competition.name}</td>
+                                </tr>
+                            </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="tuile">
+                        <h2>Nombre de matchs : ${totalMatchs}</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="tuile">
+                        <h2>Nombre de victoires : ${totalVictories}</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="tuile">
+                        <h2>Nombre de défaites : ${totalLooses}</h2>
+                    </div>
                 </div>
             </div>
 

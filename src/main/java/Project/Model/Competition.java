@@ -10,7 +10,10 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -29,6 +32,9 @@ public class Competition implements Serializable {
     @Column(name="description")
     @Getter @Setter private String description;
 
+    @Column(name="creation", nullable = false)
+    @Getter @Setter private Date creation;
+
     @Column(name="state")
     @Getter @Setter private Boolean state;
 
@@ -43,6 +49,9 @@ public class Competition implements Serializable {
     public Competition() {
         this.participations = new ArrayList<Participation>();
         this.resultats = new ArrayList<Resultat>();
+        Calendar calendar = Calendar.getInstance();
+        java.sql.Date dateCreation = new java.sql.Date(calendar.getTime().getTime());
+        this.creation = dateCreation;
     }
 
     public Competition(String name, String description, Boolean state)  {

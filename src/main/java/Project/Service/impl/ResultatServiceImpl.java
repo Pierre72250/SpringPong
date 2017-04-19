@@ -4,6 +4,7 @@ import Project.DAO.ParticipationDAO;
 import Project.DAO.ResultatDAO;
 import Project.Model.Participation;
 import Project.Model.Resultat;
+import Project.Model.User;
 import Project.Service.ParticipationService;
 import Project.Service.ResulatService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +21,20 @@ public class ResultatServiceImpl implements ResulatService {
         @Override
         public long add(Resultat resultat) {
                 return resultatDAO.add(resultat);
+        }
+
+        @Override
+        public Long getTotalMatchs(User user) {
+                return resultatDAO.getTotalMatchs(user);
+        }
+
+        @Override
+        public Long getTotalVictories(User user) {
+                return resultatDAO.getTotalVictories(user);
+        }
+
+        @Override
+        public Long getTotalLooses(User user) {
+                return resultatDAO.getTotalLooses(user);
         }
 }
