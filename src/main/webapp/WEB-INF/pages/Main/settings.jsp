@@ -26,10 +26,9 @@
                     <form:input type="text" class="form-control" id="surname" path="surname" placeholder="Prénom" />
                 </div>
                 <div class="form-group">
-                    <label for="surname">Date de naissance :</label>
-                    <input type="date" class="form-control" placeholder="Date de naissance"/>
+                    <label for="dateString">Date de naissance :</label>
+                    <input type="date" class="form-control" id="dateString" name="dateString" value="${dateOfBirth}"/>
                 </div>
-
 
                 <button type="submit" class="btn btn-primary">Modifier mes informations personnelles</button>
             </form:form>
@@ -44,6 +43,10 @@
                 <div class="form-group">
                     <label for="password">Mot de passe : </label>
                     <form:input type="password" class="form-control" id="password" path="password" placeholder="Mot de passe" />
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Nouveau mot de passe :</label>
+                    <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Nouveau mot de passe" />
                 </div>
                 <div class="form-group">
                     <label for="confirmPassword">Confirmation de mot de passe : </label>

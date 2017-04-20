@@ -48,6 +48,7 @@ public class MainController {
         }
 
         user.setPassword(encodeSHA512(user.getPassword()));
+        user.setDateOfBirth(null);
 
         // On ajoute l'utilisateur dans la bdd
         long id = userService.add(user);

@@ -6,6 +6,8 @@ public interface UserService {
 
     public long add(User user);
 
+    public void update(User user);
+
     public User getById(long id, boolean lazy);
 
     public User getByMail(String mail);

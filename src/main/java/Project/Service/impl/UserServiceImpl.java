@@ -20,6 +20,9 @@ public class UserServiceImpl implements UserService {
         }
 
         @Override
+        public void update(User user) { userDAO.update(user); }
+
+        @Override
         public User getById(long id, boolean lazy) {
                 return userDAO.getById(id, lazy);
         }

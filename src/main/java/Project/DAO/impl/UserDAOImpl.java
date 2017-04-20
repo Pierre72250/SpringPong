@@ -24,6 +24,11 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public void update(User user) {
+        sessionFactory.getCurrentSession().saveOrUpdate(user);
+    }
+
+    @Override
     public User getById(long id, boolean lazy) {
         try{
             User user =  sessionFactory.getCurrentSession().get(User.class, id);

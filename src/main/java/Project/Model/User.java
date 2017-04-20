@@ -11,6 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,9 @@ public class User implements Serializable {
     @Size(min = 2, max = 50)
     @Getter @Setter private String surname;
 
+    @Column(name="dateOfBirth")
+    @Getter @Setter private Date dateOfBirth;
+
     @Column(name="mail")
     @Size(min = 2, max = 50)
     @Getter @Setter private String mail;
@@ -46,10 +50,11 @@ public class User implements Serializable {
 
     public User() {this.participations = new ArrayList<Participation>();}
 
-    public User(String name, String surname, String mail, String password)  {
+    public User(String name, String surname, Date dateOfBirth, String mail, String password)  {
         this();
         this.name = name;
         this.surname = surname;
+        this.dateOfBirth = dateOfBirth;
         this.mail = mail;
         this.password = password;
     }
